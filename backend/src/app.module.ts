@@ -6,6 +6,7 @@ import * as path from 'node:path';
 import { configProvider } from './app.config.provider';
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -13,7 +14,14 @@ import { OrderModule } from './order/order.module';
       isGlobal: true,
       cache: true,
     }),
-    MongooseModule.forRoot('mongodb://localhost/afisha'),
+    MongooseModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        uri: `${configService.get<string>('DATABASE_URL')}`,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }),
+      inject: [ConfigService],
+    }),
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
       serveRoot: '/content/',

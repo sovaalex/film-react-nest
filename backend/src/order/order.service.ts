@@ -12,15 +12,23 @@ export class OrderService {
   ) {}
 
   async createOrders(orders: CreateOrderDto[]): Promise<OrderResponseDto> {
-    for (const order of orders) {
-      const film = await this.filmsRepository.findById(order.film);
+    const uniqueFilmIds = Array.from(
+      new Set(orders.map((order) => order.film)),
+    );
+    const filmsMap = new Map<string, any>();
 
+    for (const filmId of uniqueFilmIds) {
+      const film = await this.filmsRepository.findById(filmId);
       if (!film) {
-        throw new BadRequestException(`Фильм с id ${order.film} не найден`);
+        throw new BadRequestException(`Фильм с id ${filmId} не найден`);
       }
+      filmsMap.set(filmId, film);
+    }
 
-      const session = film.schedule.find((s) => s.id === order.session);
+    for (const order of orders) {
+      const film = filmsMap.get(order.film.toString());
 
+      const session = film.schedule.find((s: any) => s.id === order.session);
       if (!session) {
         throw new BadRequestException(
           `Сеанс с id ${order.session} не найден для фильма ${order.film}`,
@@ -39,7 +47,9 @@ export class OrderService {
         session.taken = [];
       }
       session.taken.push(seatKey);
+    }
 
+    for (const film of filmsMap.values()) {
       await this.filmsRepository.updateFilm(film);
     }
 
