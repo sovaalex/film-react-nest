@@ -7,6 +7,9 @@ import { configProvider } from './app.config.provider';
 import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
 import { ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Schedule } from './entities/Schedule.entity';
+import { Film } from './entities/film.entity';
 
 @Module({
   imports: [
@@ -19,6 +22,19 @@ import { ConfigService } from '@nestjs/config';
         uri: `${configService.get<string>('DATABASE_URL')}`,
         useNewUrlParser: true,
         useUnifiedTopology: true,
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: async (configService: ConfigService) => ({
+        type: 'postgres',
+        host: 'localhost',
+        port: 5432,
+        username: 'film',
+        password: 'student',
+        database: 'film_project',
+        entities: [Schedule, Film],
+        synchronize: true,
       }),
       inject: [ConfigService],
     }),
