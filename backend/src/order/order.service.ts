@@ -58,7 +58,7 @@ export class OrderService {
     return {
       total: result.length,
       items: result.map((order) => ({
-        ...order.toObject(),
+        ...order,
         id: order.id,
       })),
     };
