@@ -7,9 +7,10 @@ import { FilmsModule } from './films/films.module';
 import { OrderModule } from './order/order.module';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Schedule } from './entities/Schedule.entity';
+import { Schedule } from './entities/schedule.entity';
 import { Film } from './entities/film.entity';
-import { Order } from './entities/Order.entity';
+import { Order } from './entities/order.entity';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { Order } from './entities/Order.entity';
     }),
     FilmsModule,
     OrderModule,
+    LoggerModule,
   ],
   controllers: [],
   providers: [configProvider],

@@ -4,7 +4,7 @@ import { FilmsService } from './films.service';
 import { FilmsRepository } from '../repository/films.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Film } from '../entities/film.entity';
-import { Schedule } from '../entities/Schedule.entity';
+import { Schedule } from '../entities/schedule.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Film, Schedule])],
