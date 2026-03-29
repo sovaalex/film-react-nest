@@ -1,0 +1,103 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: film-postgres
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: film
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - database-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d film"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: film-pgadmin
+    env_file:
+      - .env
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - public-network
+      - database-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: ghcr.io/sovaalex/sp16_frontend:latest
+    container_name: project-frontend
+    env_file:
+      - ./frontend/.env
+    restart: unless-stopped
+    volumes:
+      - frontend_dist:/usr/share/nginx/html:ro
+    networks:
+      - public-network
+    depends_on:
+      - backend
+
+  nginx:
+    image: ghcr.io/sovaalex/sp16_server:latest
+    container_name: project-nginx
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/usr/share/nginx/html:ro
+    networks:
+      - public-network
+    depends_on:
+      - frontend
+      - backend
+
+  backend:
+    image: ghcr.io/sovaalex/sp16_backend:latest
+    container_name: film-backend
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/film
+      FRONTEND_URL: http://nginx
+    volumes:
+      - /app/node_modules
+    networks:
+      - public-network
+      - database-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  database-network:
+    driver: bridge
+    internal: true
+  public-network:
+    driver: bridge 
+  
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  frontend_dist:
+    driver: local
