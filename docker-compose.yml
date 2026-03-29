@@ -14,7 +14,7 @@ services:
     networks:
       - database-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d projectdb"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d film"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,7 +26,8 @@ services:
       - .env
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_PASSWORD: ${PG_ADMIN_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "8080:80"
     volumes:
