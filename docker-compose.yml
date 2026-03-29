@@ -40,10 +40,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    image: ghcr.io/${USER}/frontend:latest
+    image: ghcr.io/sovaalex/sp16_frontend:latest
     container_name: project-frontend
     env_file:
       - ./frontend/.env
@@ -56,10 +53,7 @@ services:
       - backend
 
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    image: ghcr.io/${USER}/nginx:latest
+    image: ghcr.io/sovaalex/sp16_server:latest
     container_name: project-nginx
     env_file:
       - .env
@@ -75,10 +69,7 @@ services:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: ghcr.io/${USER}/backend:latest
+    image: ghcr.io/sovaalex/sp16_backend:latest
     container_name: film-backend
     env_file:
       - ./backend/.env
