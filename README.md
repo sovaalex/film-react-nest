@@ -1,5 +1,7 @@
 # FILM!
 
+сайт: sovrur.nomorepartiessite.ru
+
 ## Установка
 
 ### MongoDB
